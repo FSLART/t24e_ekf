@@ -62,7 +62,8 @@ EKF::EKF() {
     // initialize the measurement model matrix
     this->H_ = Eigen::MatrixXd(5, 4);
 
-
+    // initialize the Kalman gain
+    this->K_ = Eigen::MatrixXd(4, 5);
 }
 
 Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
