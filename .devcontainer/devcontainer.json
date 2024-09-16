@@ -22,8 +22,8 @@
 		"source=/my/bag/files,target=/bags,type=bind"
 	]*/
 
-	"workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws/src/my_package,type=bind",
-	"workspaceFolder": "/ros2_ws/src/my_package",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws/src/t24e_ekf,type=bind",
+	"workspaceFolder": "/ros2_ws/src/t24e_ekf",
 
 	"customizations": {
 		"vscode": {
