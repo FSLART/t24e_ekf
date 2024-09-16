@@ -40,6 +40,25 @@ EKF::EKF() {
     // initialize the state transition matrix
     this->F_ = Eigen::MatrixXd(4, 4);
 
+    // initialize the motion model variables covariance noise
+    this->sigma_noise_ = Eigen::MatrixXd(2, 2);
+    this->sigma_noise_ << pow(VELOCITY_MEASUREMENT_STD, 2), 0,
+                          0, pow(ANGLE_MEASUREMENT_STD, 2);
+
+    // initialize the motion noise covariance matrix
+    this->R_ = Eigen::MatrixXd(4, 4);
+
+    // initialize the measurement noise covariance matrix
+    this->Q_ = Eigen::MatrixXd(5, 5);
+    this->Q_ = POSITION_MEASUREMENT_VAR, 0, 0, 0, 0,
+               0, POSITION_MEASUREMENT_VAR, 0, 0, 0,
+               0, 0, HEADING_MEASUREMENT_VAR, 0, 0,
+               0, 0, 0, VELOCITY_MEASUREMENT_VAR, 0,
+               0, 0, 0, 0, VELOCITY_MEASUREMENT_VAR;
+
+    // initialize the measurement model matrix
+    this->H_ = Eigen::MatrixXd(5, 4);
+
 
 }
 
@@ -53,3 +72,22 @@ Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
 
     return this->F_;
 }
+
+Eigen::MatrixXd EKF::compute_H(Eigen::VectorXd z) {
+
+    // compute the linear velocity
+    double v = sqrt(pow(this->state_(3), 2) + pow(this->state_(4), 2));
+
+    // compute the measurement model matrix
+    this->H_ = 1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, -v * sin(this->state_(2)), cos(this->state_(2)),
+                0, 0, v * cos(this->state_(2)), sin(this->state_(2));
+
+    return this->H_;
+}
+
+
+
+

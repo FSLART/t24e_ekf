@@ -26,7 +26,33 @@ SOFTWARE.
 
 #include <eigen3/Eigen/Dense>
 #include <utility>
+#include <cmath>
 #include "lart_common/lart_common.h"
+
+/*! \brief Standard deviation of the velocity measurement noise. */
+#define VELOCITY_MEASUREMENT_STD 0.2
+
+/*! \brief Standard deviation of the angle measurement noise. */
+#define ANGLE_MEASUREMENT_STD 0.0000467
+
+/*! \brief Standard deviation of the position measurement noise. */
+#define POSITION_MEASUREMENT_STD 0.05
+
+/*! \brief Variance of the position measurement noise. */
+#define POSITION_MEASUREMENT_VAR pow(POSITION_MEASUREMENT_STD, 2)
+
+/*! \brief Standard deviation of the heading measurement noise. */
+#define HEADING_MEASUREMENT_STD 0.5
+
+/*! \brief Variance of the heading measurement noise. */
+#define HEADING_MEASUREMENT_VAR pow(HEADING_MEASUREMENT_STD, 2)
+
+/*! \brief Standard deviation of the velocity measurement noise. */
+#define VELOCITY_MEASUREMENT_STD 0.05
+
+/*! \brief Variance of the velocity measurement noise. */
+#define VELOCITY_MEASUREMENT_VAR pow(VELOCITY_MEASUREMENT_STD, 2)
+
 
 /*! \brief Extended Kalman Filter class. */
 class EKF {
@@ -79,6 +105,12 @@ class EKF {
          * \return State transition matrix.
          */
         Eigen::MatrixXd compute_F(Eigen::VectorXd u);
+
+        /*! \brief Compute the measurement matrix.
+         * \param z Measurement vector.
+         * \return Measurement matrix.
+         */
+        Eigen::MatrixXd compute_H(Eigen::VectorXd z);
 };
 
 #endif // T24E_EKF_EKF_H_
