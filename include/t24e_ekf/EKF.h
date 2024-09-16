@@ -32,9 +32,24 @@ SOFTWARE.
 class EKF {
     public:
         /*! \brief Constructor of the EKF class. */
-        EKF();
+        EKF(double delta_t);
+
+        /*! \brief Predict the state.
+         * \param u Control input vector.
+         * \return Pair containing the predicted state vector and covariance matrix.
+         */
+        std::pair<Eigen::VectorXd,Eigen::MatrixXd> predict(Eigen::VectorXd u);
+
+        /*! \brief Update the state. 
+         * \param z Measurement vector.
+         * \return Pair containing the updated state vector and covariance matrix.
+         */
+        std::pair<Eigen::VectorXd,Eigen::MatrixXd> update(Eigen::VectorXd z);
 
     private:
+        /*! \brief Time step. */
+        double delta_t_;
+
         /*! \brief State vector. */
         Eigen::VectorXd state_;
 
@@ -59,18 +74,11 @@ class EKF {
         /*! \brief Kalman gain. */
         Eigen::MatrixXd K_;
 
-        /*! \brief Predict the state.
-         * \param u Control input vector.
-         * \return Pair containing the predicted state vector and covariance matrix.
+        /*! \brief Compute the state transition matrix from the control vector.
+         * \param u Control vector.
+         * \return State transition matrix.
          */
-        std::pair<Eigen::VectorXd,Eigen::MatrixXd> predict(Eigen::VectorXd u);
-
-        /*! \brief Update the state. 
-         * \param z Measurement vector.
-         * \return Pair containing the updated state vector and covariance matrix.
-         */
-        std::pair<Eigen::VectorXd,Eigen::MatrixXd> update(Eigen::VectorXd z);
-
+        Eigen::MatrixXd compute_F(Eigen::VectorXd u);
 };
 
 #endif // T24E_EKF_EKF_H_
