@@ -112,7 +112,7 @@ class EKF {
          */
         Eigen::MatrixXd compute_F(Eigen::VectorXd u);
 
-        /*! \brief Compute the Jacobian of the motion model with respect to the state. 
+        /*! \brief Compute the Jacobian of the motion model with respect to the noise. 
          * \param u Control vector.
          * \return Jacobian of the motion model.
          */
