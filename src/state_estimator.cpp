@@ -21,26 +21,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef MY_PACKAGE_LISTENER_H_
-#define MY_PACKAGE_LISTENER_H_
 
-#include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
+#include "t24e_ekf/state_estimator.h"
 
-/*! \brief Simple subscriber class. Subscribes a string message. */
-class Listener : public rclcpp::Node {
+StateEstimator::StateEstimator() : Node("state_estimator") {
 
-    public:
-        /*! \brief Constructor of the Subscriber class. */
-        Listener();
+}
 
-    private:
-        /*! \brief Subscriber for the string message. */
-        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscriber_;
+int main(int argc, char *argv[]) {
 
-        /*! \brief Callback function for the subscriber. Called every time a message arrives and logs the message. */
-        void topic_callback(const std_msgs::msg::String::SharedPtr message) const;
+    // initialize ROS2
+    rclcpp::init(argc, argv);
 
-};
+    // create a node instance and spin
+    rclcpp::spin(std::make_shared<StateEstimator>());
 
-#endif // MY_PACKAGE_LISTENER_H_
+    // shutdown ROS after the node is destroyed
+    rclcpp::shutdown();
+
+    return 0;
+}

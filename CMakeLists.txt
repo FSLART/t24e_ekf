@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(my_package)
+project(t24e_ekf)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -12,6 +12,7 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(lart_msgs REQUIRED)
 
 include_directories(include)
 
@@ -27,15 +28,11 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(talker src/talker.cpp)
-ament_target_dependencies(talker rclcpp std_msgs)
-
-add_executable(listener src/listener.cpp)
-ament_target_dependencies(listener rclcpp std_msgs)
+add_executable(state_estimator src/state_estimator.cpp)
+ament_target_dependencies(state_estimator rclcpp lart_msgs)
 
 install(TARGETS
-  talker
-  listener
+  state_estimator
   DESTINATION lib/${PROJECT_NAME}
 )
 

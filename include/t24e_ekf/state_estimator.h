@@ -21,31 +21,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef T24E_EKF_STATE_ESTIMATOR_H_
+#define T24E_EKF_STATE_ESTIMATOR_H_
 
-#include "my_package/listener.h"
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
+#include "lart_msgs/msg/gnssins.hpp"
 
-Listener::Listener() : Node("listener") {
+/*! \brief Simple subscriber class. Subscribes a string message. */
+class StateEstimator : public rclcpp::Node {
 
-    // create the subscriber for string messages on the topic "topic"
-    this->subscriber_ = this->create_subscription<std_msgs::msg::String>("topic", 10, std::bind(&Listener::topic_callback, this, std::placeholders::_1));
-}
+    public:
+        /*! \brief Constructor of the state estimator class. */
+        StateEstimator();
 
-void Listener::topic_callback(const std_msgs::msg::String::SharedPtr message) const {
+    private:
+        /*! \brief Subscriber for the GNSS/INS message. */
+        rclcpp::Subscription<lart_msgs::msg::GNSSINS>::SharedPtr gnss_sub_;
 
-    // log the message
-    RCLCPP_INFO(this->get_logger(), "I heard: '%s'", message->data.c_str());
-}
+};
 
-int main(int argc, char *argv[]) {
-
-    // initialize ROS2
-    rclcpp::init(argc, argv);
-
-    // create a node instance and spin
-    rclcpp::spin(std::make_shared<Listener>());
-
-    // shutdown ROS after the node is destroyed
-    rclcpp::shutdown();
-
-    return 0;
-}
+#endif // T24E_EKF_STATE_ESTIMATOR_H_
