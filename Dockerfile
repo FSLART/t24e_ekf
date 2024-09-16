@@ -6,6 +6,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update
 RUN apt upgrade -y
 
+# install eigen for linear algebra operations
+RUN apt install -y libeigen3-dev
+
 # create a repository for a workspace
 RUN mkdir -p /ros2_ws/src
 WORKDIR /ros2_ws/src/my_package
