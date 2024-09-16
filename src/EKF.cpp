@@ -76,6 +76,17 @@ Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
     return this->F_;
 }
 
+Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
+
+    // compute the Jacobian of the motion model with respect to the noise
+    this->G_ = cos(this->state_(2)) * this->delta_t_, 0,
+               sin(this->state_(2)) * this->delta_t_, 0,
+               (tan(u(1)) / WHEELBASE_M) * this->delta_t_, u(0) * (SEC2(u(1)) / WHEELBASE_M) * this->delta_t_,
+               1, 0;
+
+    return this->G_;
+}
+
 Eigen::MatrixXd EKF::compute_H(Eigen::VectorXd z) {
 
     // compute the linear velocity
@@ -109,18 +120,22 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
     this->sigma_ = this->F_ * this->sigma_ * this->F_.transpose() + this->R_;
 
     return std::make_pair(this->state_, this->sigma_);
-
 }
 
-Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
+std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::update(Eigen::VectorXd z) {
 
-    // compute the Jacobian of the motion model with respect to the noise
-    this->G_ = cos(this->state_(2)) * this->delta_t_, 0,
-               sin(this->state_(2)) * this->delta_t_, 0,
-               (tan(u(1)) / WHEELBASE_M) * this->delta_t_, u(0) * (SEC2(u(1)) / WHEELBASE_M) * this->delta_t_,
-               1, 0;
+    // compute the measurement model matrix
+    this->H_ = compute_H(z);
 
-    return this->G_;
+    // compute the Kalman gain
+    this->K_ = this->sigma_ * this->H_.transpose() * (this->H_ * this->sigma_ * this->H_.transpose() + this->Q_).inverse();
+
+    // update the state
+    this->state_ = this->state_ + this->K_ * (z - this->H_ * this->state_);
+
+    // update the covariance matrix
+    this->sigma_ = (Eigen::MatrixXd::Identity(4, 4) - this->K_ * this->H_) * this->sigma_;
+
+    return std::make_pair(this->state_, this->sigma_);
 }
-
 
