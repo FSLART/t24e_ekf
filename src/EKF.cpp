@@ -45,6 +45,9 @@ EKF::EKF() {
     this->sigma_noise_ << pow(VELOCITY_MEASUREMENT_STD, 2), 0,
                           0, pow(ANGLE_MEASUREMENT_STD, 2);
 
+    // initialize the Jacobian of the motion model with respect to the noise
+    this->G_ = Eigen::MatrixXd(4, 2);
+
     // initialize the motion noise covariance matrix
     this->R_ = Eigen::MatrixXd(4, 4);
 
@@ -88,6 +91,36 @@ Eigen::MatrixXd EKF::compute_H(Eigen::VectorXd z) {
     return this->H_;
 }
 
+std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
 
+    // compute the state transition matrix
+    this->F_ = compute_F(u);
+
+    // predict the state
+    this->state_ = this->F_ * this->state_;
+
+    // compute the Jacobian of the motion model with respect to the noise
+    this->G_ = this->compute_G(u);
+
+    // compute the motion noise covariance matrix
+    this->R_ = this->G_ * this->sigma_noise_ * this->G_.transpose();
+
+    // predict the covariance matrix
+    this->sigma_ = this->F_ * this->sigma_ * this->F_.transpose() + this->R_;
+
+    return std::make_pair(this->state_, this->sigma_);
+
+}
+
+Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
+
+    // compute the Jacobian of the motion model with respect to the noise
+    this->G_ = cos(this->state_(2)) * this->delta_t_, 0,
+               sin(this->state_(2)) * this->delta_t_, 0,
+               (tan(u(1)) / WHEELBASE_M) * this->delta_t_, u(0) * (SEC2(u(1)) / WHEELBASE_M) * this->delta_t_,
+               1, 0;
+
+    return this->G_;
+}
 
 

@@ -53,6 +53,9 @@ SOFTWARE.
 /*! \brief Variance of the velocity measurement noise. */
 #define VELOCITY_MEASUREMENT_VAR pow(VELOCITY_MEASUREMENT_STD, 2)
 
+/*! \brief Macro to compute the secant of an angle. */
+#define SEC2(ANGLE) 1 / (pow(cos(ANGLE), 2))
+
 
 /*! \brief Extended Kalman Filter class. */
 class EKF {
@@ -88,6 +91,9 @@ class EKF {
         /*! \brief Covariance matrix for the variables of the motion model (2x2 velocity and st. angle). */
         Eigen::MatrixXd sigma_noise_;
 
+        /*! \brief Jacobian of the motion model with respect to the noise. */
+        Eigen::MatrixXd G_;
+
         /*! \brief Motion noise covariance matrix. */
         Eigen::MatrixXd R_;
 
@@ -105,6 +111,12 @@ class EKF {
          * \return State transition matrix.
          */
         Eigen::MatrixXd compute_F(Eigen::VectorXd u);
+
+        /*! \brief Compute the Jacobian of the motion model with respect to the state. 
+         * \param u Control vector.
+         * \return Jacobian of the motion model.
+         */
+        Eigen::MatrixXd compute_G(Eigen::VectorXd u);
 
         /*! \brief Compute the measurement matrix.
          * \param z Measurement vector.
