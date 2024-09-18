@@ -25,8 +25,9 @@ SOFTWARE.
 #define T24E_EKF_STATE_ESTIMATOR_H_
 
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include "lart_msgs/msg/gnssins.hpp"
+#include "lart_msgs/msg/dynamics.hpp"
 
 /*! \brief Simple subscriber class. Subscribes a string message. */
 class StateEstimator : public rclcpp::Node {
@@ -36,8 +37,23 @@ class StateEstimator : public rclcpp::Node {
         StateEstimator();
 
     private:
-        /*! \brief Subscriber for the GNSS/INS message. */
+        /*! \brief Subscriber for the GNSS/INS message (used for the measurement model). */
         rclcpp::Subscription<lart_msgs::msg::GNSSINS>::SharedPtr gnss_sub_;
+
+        /*! \brief Subscriber for the dynamics message (used for the motion model). */
+        rclcpp::Subscription<lart_msgs::msg::Dynamics>::SharedPtr dynamics_sub_;
+
+        /*! \brief Callback function for the GNSS/INS message. */
+        void gnss_callback(const lart_msgs::msg::GNSSINS::SharedPtr msg);
+
+        /*! \brief Callback function for the dynamics message. */
+        void dynamics_callback(const lart_msgs::msg::Dynamics::SharedPtr msg);
+
+        /*! \brief Publisher for the state estimate. */
+        rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr state_pub_;
+
+        /*! \brief Current state vector (x, y, theta, v). */
+        Eigen::VectorXd state_;
 
 };
 
