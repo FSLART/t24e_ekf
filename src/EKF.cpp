@@ -23,7 +23,10 @@ SOFTWARE.
 */
 #include "t24e_ekf/EKF.h"
 
-EKF::EKF() {
+EKF::EKF(double delta_t) {
+
+    // assign the time step
+    this->delta_t = delta_t;
 
     // initialize the state vector
     // x, y, theta, v
