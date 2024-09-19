@@ -50,3 +50,8 @@ TEST_F(EKFTest, InitEKFShapes)
     ASSERT_EQ(sigma.rows(), 4);
     ASSERT_EQ(sigma.cols(), 4);
 }
+
+int main(int argc, char *argv[]) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
