@@ -1,3 +1,12 @@
+# T24-e State Estimator (Extended Kalman Filter)
+
+## Unit Testing
+
+```colcon test --packages-select t24e_ekf --event-handler=console_direct+```
+
+
+
+
 # ROS2 Template C++
 
 Template repository for a ROS2 package with a publisher and a subscriber node.
