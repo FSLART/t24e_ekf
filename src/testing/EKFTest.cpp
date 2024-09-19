@@ -51,6 +51,56 @@ TEST_F(EKFTest, InitEKFShapes)
     ASSERT_EQ(sigma.cols(), 4);
 }
 
+TEST_F(EKFTest, PredictAndMeasure)
+{
+    // create the control vector
+    Eigen::VectorXd u(2);
+    u << 1.0, 0.1;
+
+    // predict the state
+    std::pair<Eigen::VectorXd,Eigen::MatrixXd> prediction = this->ekf->predict(u);
+
+    // get the predicted state and covariance
+    Eigen::VectorXd state = prediction.first;
+    Eigen::MatrixXd sigma = prediction.second;
+
+    // assert x to be 0.1
+    ASSERT_NEAR(state(0), 0.1, 1e-6);
+
+    // assert y to be 0.0
+    ASSERT_NEAR(state(1), 0.0, 1e-6);
+
+    // assert theta to be 0.0064732
+    ASSERT_NEAR(state(2), 0.0064732, 1e-6);
+
+    // assert velocity to be 1.0
+    ASSERT_NEAR(state(3), 1.0, 1e-6);
+
+    // create the measurement vector
+    Eigen::VectorXd z(5);
+    z << 0.1, 0.0, 0.0064732, 0.99, 0.02;
+
+    // update the state
+    std::pair<Eigen::VectorXd,Eigen::MatrixXd> update = this->ekf->update(z);
+
+    // get the updated state and covariance
+    state = update.first;
+    sigma = update.second;
+
+    // assert x to be 0.1
+    ASSERT_NEAR(state(0), 0.1, 1e-2);
+
+    // assert y to be 0.0
+    ASSERT_NEAR(state(1), 0.0, 1e-2);
+
+    // assert theta to be 0.0064732
+    ASSERT_NEAR(state(2), 0.0064732, 1e-2);
+
+    // assert velocity to be 1
+    ASSERT_NEAR(state(3), 1.0, 1e-1);
+
+}
+
 int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
