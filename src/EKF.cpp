@@ -88,17 +88,14 @@ Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
     return this->G_;
 }
 
-Eigen::MatrixXd EKF::compute_H(Eigen::VectorXd z) {
-
-    // compute the linear velocity
-    double v = sqrt(pow(this->state_(3), 2) + pow(this->state_(4), 2));
+Eigen::MatrixXd EKF::compute_H() {
 
     // compute the measurement model matrix
     this->H_ = 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
-                0, 0, -v * sin(this->state_(2)), cos(this->state_(2)),
-                0, 0, v * cos(this->state_(2)), sin(this->state_(2));
+                0, 0, -this->state_(3) * sin(this->state_(2)), cos(this->state_(2)),
+                0, 0, this->state_(3) * cos(this->state_(2)), sin(this->state_(2));
 
     return this->H_;
 }

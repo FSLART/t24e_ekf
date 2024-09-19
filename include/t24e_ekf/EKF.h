@@ -79,7 +79,7 @@ class EKF {
         /*! \brief Time step. */
         double delta_t_;
 
-        /*! \brief State vector. */
+        /*! \brief State vector. Is a 4-dimensional vector (x, y, theta, velocity)*/
         Eigen::VectorXd state_;
 
         /*! \brief Covariance matrix. */
@@ -118,11 +118,10 @@ class EKF {
          */
         Eigen::MatrixXd compute_G(Eigen::VectorXd u);
 
-        /*! \brief Compute the measurement matrix.
-         * \param z Measurement vector.
+        /*! \brief Compute the measurement matrix. Maps the current state to the expected measurement.
          * \return Measurement matrix.
          */
-        Eigen::MatrixXd compute_H(Eigen::VectorXd z);
+        Eigen::MatrixXd compute_H();
 };
 
 #endif // T24E_EKF_EKF_H_
