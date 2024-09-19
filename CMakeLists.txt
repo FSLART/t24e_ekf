@@ -13,23 +13,25 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(lart_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
 
-include_directories(include)
+include_directories(include ${EIGEN3_INCLUDE_DIR})
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
-  set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest REQUIRED)
+  include_directories(include ${EIGEN3_INCLUDE_DIR} ${GTEST_INCLUDE_DIRS})
+  ament_add_gtest(test_ekf src/testing/EKFTest.cpp src/EKF.cpp)
+  target_include_directories(test_ekf PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  )
+  target_link_libraries(test_ekf Eigen3::Eigen)
 endif()
 
-add_executable(state_estimator src/state_estimator.cpp)
+add_executable(state_estimator src/state_estimator.cpp src/EKF.cpp)
 ament_target_dependencies(state_estimator rclcpp lart_msgs)
+
+target_link_libraries(state_estimator Eigen3::Eigen)
 
 install(TARGETS
   state_estimator
