@@ -28,6 +28,7 @@ SOFTWARE.
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include "lart_msgs/msg/gnssins.hpp"
 #include "lart_msgs/msg/dynamics.hpp"
+#include "t24e_ekf/EKF.h"
 
 /*! \brief Simple subscriber class. Subscribes a string message. */
 class StateEstimator : public rclcpp::Node {
