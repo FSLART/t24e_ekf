@@ -22,6 +22,7 @@ RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-in
 
 # copy the package to the container workspace
 COPY . /ros2_ws/src/t24e_ekf
+WORKDIR /ros2_ws
 
 # build the package
 # RUN /bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && colcon build --symlink-install --parallel-workers 4"
