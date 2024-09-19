@@ -27,7 +27,27 @@ SOFTWARE.
 #include <eigen3/Eigen/Dense>
 #include <utility>
 #include <cmath>
+#include <iostream>
+#include <numbers>
 #include "lart_common/lart_common.h"
+
+/*! \brief Standard deviation of the initial position. */
+#define INIT_POS_STD 30.0
+
+/*! \brief Variation of the initial position. */
+#define INIT_POS_VAR pow(INIT_POS_STD, 2)
+
+/*! \brief Standard deviation of the initial theta. */
+#define INIT_THETA_STD 360.0
+
+/*! \brief Variation of the initial theta. */
+#define INIT_THETA_VAR pow(INIT_THETA_STD, 2)
+
+/*! \brief Standard deviation of the initial velocity. */
+#define INIT_VEL_STD 10.0
+
+/*! \brief Variation of the initial velocity. */
+#define INIT_VEL_VAR pow(INIT_VEL_STD, 2)
 
 /*! \brief Standard deviation of the velocity measurement noise. */
 #define VELOCITY_MEASUREMENT_MOTOR_STD 0.2
@@ -115,6 +135,17 @@ class EKF {
 
         /*! \brief Kalman gain. */
         Eigen::MatrixXd K_;
+
+        /*! \brief Compute the motion model. 
+         * \param u Control vector.
+         * \return State vector.
+         */
+        Eigen::VectorXd f(Eigen::VectorXd u);
+
+        /*! \brief Compute the measurement model. 
+         * \return Expected measurement vector.
+         */
+        Eigen::VectorXd h();
 
         /*! \brief Compute the state transition matrix from the control vector.
          * \param u Control vector.

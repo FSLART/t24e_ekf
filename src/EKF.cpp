@@ -37,8 +37,8 @@ EKF::EKF(double delta_t) {
     this->sigma_ = Eigen::MatrixXd(4, 4);
     this->sigma_ << 0.0, 0.0, 0.0, 0.0,
                     0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.1, 0.0,
-                    0.0, 0.0, 0.0, 0.1;
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0;
 
     // initialize the state transition matrix
     this->F_ = Eigen::MatrixXd(4, 4);
@@ -69,6 +69,31 @@ EKF::EKF(double delta_t) {
     this->K_ = Eigen::MatrixXd(4, 5);
 }
 
+Eigen::VectorXd EKF::f(Eigen::VectorXd u) {
+
+    // compute the motion model
+    Eigen::VectorXd f(4);
+    f << this->state_(0) + u(0) * cos(this->state_(2)) * this->delta_t_,
+         this->state_(1) + u(0) * sin(this->state_(2)) * this->delta_t_,
+         this->state_(2) + (u(0) / WHEELBASE_M) * tan(u(1)) * this->delta_t_,
+         u(0);
+
+    return f;
+}
+
+Eigen::VectorXd EKF::h() {
+
+    // compute the measurement model
+    Eigen::VectorXd h(5);
+    h << this->state_(0),
+        this->state_(1),
+        this->state_(2),
+        this->state_(3) * cos(this->state_(2)),
+        this->state_(3) * sin(this->state_(2));
+
+    return h;
+}
+
 Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
 
     // compute the state transition matrix
@@ -93,6 +118,8 @@ Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
 
 Eigen::MatrixXd EKF::compute_H() {
 
+    std::cout << "state in compute H: " << this->state_ << std::endl;
+
     // compute the measurement model matrix
     this->H_ << 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
@@ -108,8 +135,12 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
     // compute the state transition matrix
     this->F_ = compute_F(u);
 
+    std::cout << "F: " << this->F_ << std::endl;
+
     // predict the state
-    this->state_ = this->F_ * this->state_;
+    this->state_ = this->f(u);
+
+    std::cout << "state: " << this->state_ << std::endl;
 
     // compute the Jacobian of the motion model with respect to the noise
     this->G_ = this->compute_G(u);
@@ -117,8 +148,12 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
     // compute the motion noise covariance matrix
     this->R_ = this->G_ * this->sigma_noise_ * this->G_.transpose();
 
+    std::cout << "R: " << this->R_ << std::endl;
+
     // predict the covariance matrix
     this->sigma_ = this->F_ * this->sigma_ * this->F_.transpose() + this->R_;
+
+    std::cout << "sigma: " << this->sigma_ << std::endl;
 
     return std::make_pair(this->state_, this->sigma_);
 }
@@ -128,14 +163,22 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::update(Eigen::VectorXd z) {
     // compute the measurement model matrix
     this->H_ = compute_H();
 
+    std::cout << "H: " << this->H_ << std::endl;
+
     // compute the Kalman gain
     this->K_ = this->sigma_ * this->H_.transpose() * (this->H_ * this->sigma_ * this->H_.transpose() + this->Q_).inverse();
 
+    std::cout << "K: " << this->K_ << std::endl;
+
     // update the state
-    this->state_ = this->state_ + this->K_ * (z - this->H_ * this->state_);
+    this->state_ = this->state_ + this->K_ * (z - this->h());
+
+    std::cout << "state: " << this->state_ << std::endl;
 
     // update the covariance matrix
     this->sigma_ = (Eigen::MatrixXd::Identity(4, 4) - this->K_ * this->H_) * this->sigma_;
+
+    std::cout << "sigma: " << this->sigma_ << std::endl;
 
     return std::make_pair(this->state_, this->sigma_);
 }
