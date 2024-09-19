@@ -20,15 +20,8 @@ RUN git clone https://github.com/FSLART/lart_msgs.git -b dev
 WORKDIR /ros2_ws
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install --parallel-workers 4 --packages-select lart_msgs"
 
-# get lart_common and put in tmp
-WORKDIR /temp
-RUN git clone https://github.com/FSLART/lart_common.git -b dev
-
 # copy the package to the container workspace
 COPY . /ros2_ws/src/t24e_ekf
-# move lart_common to the package's include
-RUN mv /temp/lart_common /ros2_ws/src/t24e_ekf/include/lart_common
-WORKDIR /ros2_ws
 
 # build the package
 # RUN /bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && colcon build --symlink-install --parallel-workers 4"
