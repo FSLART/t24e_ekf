@@ -26,27 +26,27 @@ SOFTWARE.
 EKF::EKF(double delta_t) {
 
     // assign the time step
-    this->delta_t = delta_t;
+    this->delta_t_ = delta_t;
 
     // initialize the state vector
     // x, y, theta, v
     this->state_ = Eigen::VectorXd(4);
-    this->state_ << 0, 0, 0, 0;
+    this->state_ << 0.0, 0.0, 0.0, 0.0;
 
     // initialize the covariance matrix
     this->sigma_ = Eigen::MatrixXd(4, 4);
-    this->sigma_ << 0, 0, 0, 0,
-                    0, 0, 0, 0,
-                    0, 0, 0.1, 0,
-                    0, 0, 0, 0.1;
+    this->sigma_ << 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.1, 0.0,
+                    0.0, 0.0, 0.0, 0.1;
 
     // initialize the state transition matrix
     this->F_ = Eigen::MatrixXd(4, 4);
 
     // initialize the motion model variables covariance noise
     this->sigma_noise_ = Eigen::MatrixXd(2, 2);
-    this->sigma_noise_ << pow(VELOCITY_MEASUREMENT_STD, 2), 0,
-                          0, pow(ANGLE_MEASUREMENT_STD, 2);
+    this->sigma_noise_ << pow(VELOCITY_MEASUREMENT_MOTOR_STD, 2), 0.0,
+                          0.0, pow(ANGLE_MEASUREMENT_STD, 2);
 
     // initialize the Jacobian of the motion model with respect to the noise
     this->G_ = Eigen::MatrixXd(4, 2);
@@ -56,11 +56,11 @@ EKF::EKF(double delta_t) {
 
     // initialize the measurement noise covariance matrix
     this->Q_ = Eigen::MatrixXd(5, 5);
-    this->Q_ = POSITION_MEASUREMENT_VAR, 0, 0, 0, 0,
-               0, POSITION_MEASUREMENT_VAR, 0, 0, 0,
-               0, 0, HEADING_MEASUREMENT_VAR, 0, 0,
-               0, 0, 0, VELOCITY_MEASUREMENT_VAR, 0,
-               0, 0, 0, 0, VELOCITY_MEASUREMENT_VAR;
+    this->Q_ << POSITION_MEASUREMENT_VAR, 0.0, 0.0, 0.0, 0.0,
+               0.0, POSITION_MEASUREMENT_VAR, 0.0, 0.0, 0.0,
+               0.0, 0.0, HEADING_MEASUREMENT_VAR, 0.0, 0.0,
+               0.0, 0.0, 0.0, VELOCITY_MEASUREMENT_VAR, 0.0,
+               0.0, 0.0, 0.0, 0.0, VELOCITY_MEASUREMENT_VAR;
 
     // initialize the measurement model matrix
     this->H_ = Eigen::MatrixXd(5, 4);
@@ -72,10 +72,10 @@ EKF::EKF(double delta_t) {
 Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
 
     // compute the state transition matrix
-    this->F_ = 1, 0, -u(0) * sin(this->state_(2)) * this->delta_t_, cos(this->state_(2)) * this->delta_t_,
-               0, 1, u(0) * cos(this->state_(2)) * this->delta_t_, sin(this->state_(2)) * this->delta_t_,
-               0, 0, 1, (tan(u(1)) / WHEELBASE_M) * this->delta_t_,
-               0, 0, 0, 1;
+    this->F_ << 1.0, 0.0, -u(0) * sin(this->state_(2)) * this->delta_t_, cos(this->state_(2)) * this->delta_t_,
+               0.0, 1.0, u(0) * cos(this->state_(2)) * this->delta_t_, sin(this->state_(2)) * this->delta_t_,
+               0.0, 0.0, 1.0, (tan(u(1)) / WHEELBASE_M) * this->delta_t_,
+               0.0, 0.0, 0.0, 1.0;
 
     return this->F_;
 }
@@ -83,10 +83,10 @@ Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
 Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
 
     // compute the Jacobian of the motion model with respect to the noise
-    this->G_ = cos(this->state_(2)) * this->delta_t_, 0,
-               sin(this->state_(2)) * this->delta_t_, 0,
+    this->G_ << cos(this->state_(2)) * this->delta_t_, 0.0,
+               sin(this->state_(2)) * this->delta_t_, 0.0,
                (tan(u(1)) / WHEELBASE_M) * this->delta_t_, u(0) * (SEC2(u(1)) / WHEELBASE_M) * this->delta_t_,
-               1, 0;
+               1.0, 0.0;
 
     return this->G_;
 }
@@ -94,11 +94,11 @@ Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
 Eigen::MatrixXd EKF::compute_H() {
 
     // compute the measurement model matrix
-    this->H_ = 1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -this->state_(3) * sin(this->state_(2)), cos(this->state_(2)),
-                0, 0, this->state_(3) * cos(this->state_(2)), sin(this->state_(2));
+    this->H_ << 1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, -this->state_(3) * sin(this->state_(2)), cos(this->state_(2)),
+                0.0, 0.0, this->state_(3) * cos(this->state_(2)), sin(this->state_(2));
 
     return this->H_;
 }
@@ -126,7 +126,7 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
 std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::update(Eigen::VectorXd z) {
 
     // compute the measurement model matrix
-    this->H_ = compute_H(z);
+    this->H_ = compute_H();
 
     // compute the Kalman gain
     this->K_ = this->sigma_ * this->H_.transpose() * (this->H_ * this->sigma_ * this->H_.transpose() + this->Q_).inverse();

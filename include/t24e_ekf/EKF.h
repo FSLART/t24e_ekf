@@ -30,7 +30,7 @@ SOFTWARE.
 #include "lart_common/lart_common.h"
 
 /*! \brief Standard deviation of the velocity measurement noise. */
-#define VELOCITY_MEASUREMENT_STD 0.2
+#define VELOCITY_MEASUREMENT_MOTOR_STD 0.2
 
 /*! \brief Standard deviation of the angle measurement noise. */
 #define ANGLE_MEASUREMENT_STD 0.0000467
