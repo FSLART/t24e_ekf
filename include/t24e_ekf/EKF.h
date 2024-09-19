@@ -75,6 +75,16 @@ class EKF {
          */
         std::pair<Eigen::VectorXd,Eigen::MatrixXd> update(Eigen::VectorXd z);
 
+        /*! \brief Get the state vector. 
+         * \return State vector.
+         */
+        Eigen::VectorXd get_state() const;
+
+        /*! \brief Get the covariance matrix. 
+         * \return Covariance matrix.
+         */
+        Eigen::MatrixXd get_sigma() const;
+
     private:
         /*! \brief Time step. */
         double delta_t_;

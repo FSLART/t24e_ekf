@@ -137,3 +137,10 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::update(Eigen::VectorXd z) {
     return std::make_pair(this->state_, this->sigma_);
 }
 
+Eigen::VectorXd EKF::get_state() const {
+    return this->state_;
+}
+
+Eigen::MatrixXd EKF::get_sigma() const {
+    return this->sigma_;
+}
