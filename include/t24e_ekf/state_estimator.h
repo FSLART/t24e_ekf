@@ -26,8 +26,10 @@ SOFTWARE.
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 #include "lart_msgs/msg/gnssins.hpp"
-#include "lart_msgs/msg/dynamics.hpp"
+#include "lart_msgs/msg/dynamics_cmd.hpp"
 #include "t24e_ekf/EKF.h"
 
 /*! \brief Simple subscriber class. Subscribes a string message. */
@@ -38,20 +40,29 @@ class StateEstimator : public rclcpp::Node {
         StateEstimator();
 
     private:
+        /*! \brief Subscriber for the dynamics message (used for the motion model). */
+        rclcpp::Subscription<lart_msgs::msg::DynamicsCMD>::SharedPtr dynamics_sub_;
+
         /*! \brief Subscriber for the GNSS/INS message (used for the measurement model). */
         rclcpp::Subscription<lart_msgs::msg::GNSSINS>::SharedPtr gnss_sub_;
 
-        /*! \brief Subscriber for the dynamics message (used for the motion model). */
-        rclcpp::Subscription<lart_msgs::msg::Dynamics>::SharedPtr dynamics_sub_;
+        /*! \brief Callback function for the dynamics message. */
+        void dynamics_callback(const lart_msgs::msg::DynamicsCMD& msg);
 
         /*! \brief Callback function for the GNSS/INS message. */
-        void gnss_callback(const lart_msgs::msg::GNSSINS::SharedPtr msg);
+        void gnss_callback(const lart_msgs::msg::GNSSINS& msg);
 
-        /*! \brief Callback function for the dynamics message. */
-        void dynamics_callback(const lart_msgs::msg::Dynamics::SharedPtr msg);
+        /*! \brief Utility method to create a pose and covariance message from a state and covariance. */
+        geometry_msgs::msg::PoseWithCovarianceStamped create_state_message(Eigen::VectorXd state, Eigen::MatrixXd covariance);
 
         /*! \brief Publisher for the state estimate. */
         rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr state_pub_;
+
+        /*! \brief Transform broadcaster. */
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+        /*! \brief Extended Kalman Filter object. */
+        std::unique_ptr<EKF> ekf_;
 
         /*! \brief Current state vector (x, y, theta, v). */
         Eigen::VectorXd state_;
