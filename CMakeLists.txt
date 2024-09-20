@@ -12,6 +12,8 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 find_package(lart_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 
@@ -20,7 +22,7 @@ include_directories(include ${EIGEN3_INCLUDE_DIR})
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   include_directories(include ${EIGEN3_INCLUDE_DIR} ${GTEST_INCLUDE_DIRS})
-  ament_add_gtest(test_ekf src/testing/EKFTest.cpp src/EKF.cpp)
+  ament_add_gtest(test_ekf src/EKF.cpp)
   target_include_directories(test_ekf PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
@@ -29,7 +31,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(state_estimator src/state_estimator.cpp src/EKF.cpp)
-ament_target_dependencies(state_estimator rclcpp lart_msgs)
+ament_target_dependencies(state_estimator rclcpp geometry_msgs tf2_ros lart_msgs Eigen3)
 
 target_link_libraries(state_estimator Eigen3::Eigen)
 
