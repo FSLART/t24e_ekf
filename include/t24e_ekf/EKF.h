@@ -28,7 +28,7 @@ SOFTWARE.
 #include <utility>
 #include <cmath>
 #include <iostream>
-#include <numbers>
+#include <chrono>
 #include "lart_common/lart_common.h"
 
 /*! \brief Standard deviation of the initial position. */
@@ -81,7 +81,7 @@ SOFTWARE.
 class EKF {
     public:
         /*! \brief Constructor of the EKF class. */
-        EKF(double delta_t);
+        EKF();
 
         /*! \brief Predict the state.
          * \param u Control input vector.
@@ -106,8 +106,12 @@ class EKF {
         Eigen::MatrixXd get_sigma() const;
 
     private:
+
         /*! \brief Time step. */
         double delta_t_;
+
+        /*! \brief Last time the filter was updated. Used to compute the time step. */
+        std::chrono::high_resolution_clock::time_point last_time_;
 
         /*! \brief State vector. Is a 4-dimensional vector (x, y, theta, velocity)*/
         Eigen::VectorXd state_;

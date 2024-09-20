@@ -23,10 +23,7 @@ SOFTWARE.
 */
 #include "t24e_ekf/EKF.h"
 
-EKF::EKF(double delta_t) {
-
-    // assign the time step
-    this->delta_t_ = delta_t;
+EKF::EKF() {
 
     // initialize the state vector
     // x, y, theta, v
@@ -67,6 +64,9 @@ EKF::EKF(double delta_t) {
 
     // initialize the Kalman gain
     this->K_ = Eigen::MatrixXd(4, 5);
+
+    // initialize the last time the filter was updated
+    this->last_time_ = std::chrono::high_resolution_clock::now();
 }
 
 Eigen::VectorXd EKF::f(Eigen::VectorXd u) {
@@ -132,6 +132,9 @@ Eigen::MatrixXd EKF::compute_H() {
 
 std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
 
+    // compute the time step
+    this->delta_t_ = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - this->last_time_).count() / 1000.0;
+
     // compute the state transition matrix
     this->F_ = compute_F(u);
 
@@ -159,6 +162,9 @@ std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::predict(Eigen::VectorXd u) {
 }
 
 std::pair<Eigen::VectorXd,Eigen::MatrixXd> EKF::update(Eigen::VectorXd z) {
+
+    // compute the time step
+    this->delta_t_ = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - this->last_time_).count() / 1000.0;
 
     // compute the measurement model matrix
     this->H_ = compute_H();
