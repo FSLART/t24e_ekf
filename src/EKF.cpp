@@ -96,8 +96,8 @@ Eigen::VectorXd EKF::h() {
     h << this->state_(0),
         this->state_(1),
         this->state_(2),
-        this->state_(3) * cos(this->state_(2)),
-        this->state_(3) * sin(this->state_(2));
+        this->state_(3) * sin(this->state_(2)),
+        this->state_(3) * cos(this->state_(2));
 
     return h;
 }
