@@ -71,12 +71,20 @@ EKF::EKF() {
 
 Eigen::VectorXd EKF::f(Eigen::VectorXd u) {
 
+    /*
+    Reminder regarding ROS coordinate system:
+        - x forward
+        - y left
+        - z up
+     */
+
+
     // compute the motion model
     Eigen::VectorXd f(4);
-    f << this->state_(0) + u(0) * cos(this->state_(2)) * this->delta_t_,
-         this->state_(1) + u(0) * sin(this->state_(2)) * this->delta_t_,
-         this->state_(2) + (u(0) / WHEELBASE_M) * tan(u(1)) * this->delta_t_,
-         u(0);
+    f << this->state_(0) + u(0) * sin(this->state_(2)) * this->delta_t_,
+        this->state_(1) + u(0) * sin(this->state_(2)) * this->delta_t_,
+        this->state_(2) + (u(0) / WHEELBASE_M) * tan(u(1)) * this->delta_t_,
+        u(0);
 
     return f;
 }
