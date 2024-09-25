@@ -82,7 +82,7 @@ Eigen::VectorXd EKF::f(Eigen::VectorXd u) {
     // compute the motion model
     Eigen::VectorXd f(4);
     f << this->state_(0) + u(0) * sin(this->state_(2)) * this->delta_t_,
-        this->state_(1) + u(0) * sin(this->state_(2)) * this->delta_t_,
+        this->state_(1) + u(0) * cos(this->state_(2)) * this->delta_t_,
         this->state_(2) + (u(0) / WHEELBASE_M) * tan(u(1)) * this->delta_t_,
         u(0);
 
@@ -105,8 +105,8 @@ Eigen::VectorXd EKF::h() {
 Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
 
     // compute the state transition matrix
-    this->F_ << 1.0, 0.0, -u(0) * sin(this->state_(2)) * this->delta_t_, cos(this->state_(2)) * this->delta_t_,
-               0.0, 1.0, u(0) * cos(this->state_(2)) * this->delta_t_, sin(this->state_(2)) * this->delta_t_,
+    this->F_ << 1.0, 0.0, u(0) * cos(this->state_(2)) * this->delta_t_, sin(this->state_(2)) * this->delta_t_,
+               0.0, 1.0, -u(0) * sin(this->state_(2)) * this->delta_t_, cos(this->state_(2)) * this->delta_t_,
                0.0, 0.0, 1.0, (tan(u(1)) / WHEELBASE_M) * this->delta_t_,
                0.0, 0.0, 0.0, 1.0;
 
@@ -116,8 +116,8 @@ Eigen::MatrixXd EKF::compute_F(Eigen::VectorXd u) {
 Eigen::MatrixXd EKF::compute_G(Eigen::VectorXd u) {
 
     // compute the Jacobian of the motion model with respect to the noise
-    this->G_ << cos(this->state_(2)) * this->delta_t_, 0.0,
-               sin(this->state_(2)) * this->delta_t_, 0.0,
+    this->G_ << sin(this->state_(2)) * this->delta_t_, 0.0,
+               cos(this->state_(2)) * this->delta_t_, 0.0,
                (tan(u(1)) / WHEELBASE_M) * this->delta_t_, u(0) * (SEC2(u(1)) / WHEELBASE_M) * this->delta_t_,
                1.0, 0.0;
 
@@ -132,8 +132,8 @@ Eigen::MatrixXd EKF::compute_H() {
     this->H_ << 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
-                0.0, 0.0, -this->state_(3) * sin(this->state_(2)), cos(this->state_(2)),
-                0.0, 0.0, this->state_(3) * cos(this->state_(2)), sin(this->state_(2));
+                0.0, 0.0, this->state_(3) * cos(this->state_(2)), sin(this->state_(2)),
+                0.0, 0.0, -this->state_(3) * sin(this->state_(2)), cos(this->state_(2));
 
     return this->H_;
 }
