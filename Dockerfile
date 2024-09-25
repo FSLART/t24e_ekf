@@ -10,6 +10,9 @@ RUN apt install git -y
 # install eigen for linear algebra operations
 RUN apt install -y libeigen3-dev
 
+# install ssh
+RUN apt install -y openssh-server
+
 # install the ROS package dependencies
 RUN apt install -y ros-humble-sensor-msgs ros-humble-geometry-msgs ros-humble-tf2 ros-humble-tf2-ros
 
