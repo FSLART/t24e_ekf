@@ -42,8 +42,8 @@ EKF::EKF() {
 
     // initialize the motion model variables covariance noise
     this->sigma_noise_ = Eigen::MatrixXd(2, 2);
-    this->sigma_noise_ << pow(VELOCITY_MEASUREMENT_MOTOR_STD, 2), 0.0,
-                          0.0, pow(ANGLE_MEASUREMENT_STD, 2);
+    this->sigma_noise_ << VELOCITY_MEASUREMENT_MOTOR_VAR, 0.0,
+                          0.0, ST_ANGLE_MEASUREMENT_VAR;
 
     // initialize the Jacobian of the motion model with respect to the noise
     this->G_ = Eigen::MatrixXd(4, 2);

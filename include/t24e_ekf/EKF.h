@@ -52,8 +52,14 @@ SOFTWARE.
 /*! \brief Standard deviation of the velocity measurement noise. */
 #define VELOCITY_MEASUREMENT_MOTOR_STD 0.2
 
-/*! \brief Standard deviation of the angle measurement noise. */
-#define ANGLE_MEASUREMENT_STD 0.0000467
+/*! \brief Variance of the velocity measurement noise. */
+#define VELOCITY_MEASUREMENT_MOTOR_VAR pow(VELOCITY_MEASUREMENT_MOTOR_STD, 2)
+
+/*! \brief Standard deviation of the steering angle measurement noise in radians. */
+#define ST_ANGLE_MEASUREMENT_STD (2*LART_PI) / ST_ENCODER_UNITS_PER_TURN
+
+/*! \brief Variance of the steering angle measurement noise in radians. */
+#define ST_ANGLE_MEASUREMENT_VAR pow(ST_ANGLE_MEASUREMENT_STD, 2)
 
 /*! \brief Standard deviation of the position measurement noise. */
 #define POSITION_MEASUREMENT_STD 0.05
@@ -61,8 +67,8 @@ SOFTWARE.
 /*! \brief Variance of the position measurement noise. */
 #define POSITION_MEASUREMENT_VAR pow(POSITION_MEASUREMENT_STD, 2)
 
-/*! \brief Standard deviation of the heading measurement noise. */
-#define HEADING_MEASUREMENT_STD 0.5
+/*! \brief Standard deviation of the heading measurement noise in radians. */
+#define HEADING_MEASUREMENT_STD DEG_TO_RAD(0.5)
 
 /*! \brief Variance of the heading measurement noise. */
 #define HEADING_MEASUREMENT_VAR pow(HEADING_MEASUREMENT_STD, 2)
