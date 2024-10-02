@@ -1,4 +1,4 @@
-# T24-e State Estimator (Extended Kalman Filter)
+# T-24e State Estimator (Extended Kalman Filter)
 
 This the the implementation of the state estimator for the T-24e car. It uses an Extended Kalman Filter. All the implementation was done from scratch.
 
