@@ -13,6 +13,17 @@ The motion model relies on the motor RPM measurements for vehicle speed calculat
 
 The **measurement model** maps the state of the vehicle into the measurement variables. That is, it creates expected measurements. The measurements correct the filter predictions. For this, the GNSS/INS was used.
 
+## Interfacing
+### Subscribers
+- /dynamics (lart_msgs/DynamicsCMD)
+- /gnss_ins (lart_msgs/GNSSINS)
+
+### Publishers
+- /state_estimate (geometry_msgs/PoseWithCovarianceStamped)
+
+### Transforms
+- map -> base_link
+
 ## Building and Running
 
 ### Bare metal
@@ -20,6 +31,7 @@ The **measurement model** maps the state of the vehicle into the measurement var
 - ROS Humble
 - Eigen 3
 - [lart_common](https://github.com/FSLART/lart_common) (comes bundled as a submodule, no need to worry)
+- [lart_msgs](https://github.com/FSLART/lart_msgs)
 
 #### Building
 - Navigate to the workspace directory.
