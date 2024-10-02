@@ -1,57 +1,57 @@
-# T24-e State Estimator (Extended Kalman Filter)
+# T-24e State Estimator (Extended Kalman Filter)
 
-## Unit Testing
+This the the implementation of the state estimator for the T-24e car. It uses an Extended Kalman Filter. All the implementation was done from scratch.
 
-```colcon test --packages-select t24e_ekf --event-handler=console_direct+```
+The implementation is in C++ and the matrix operations are handled by the well-known Eigen linear algebra library.
 
+A Kalman Filter needs two models: the **motion model** and the **measurement model**. From this point on the terminology car, vehicle or system denote the same thing.
 
+In this case, the state of the vehicle is characterized by its position in 2D, yaw angle and speed.
 
+The **motion model** predicts the motion of the system using the knowledge of the system dynamics. Considering the system is in this case a car with ackermann steering, the simplest solution was chosen, which is the kinematic bicycle model. 
+The motion model relies on the motor RPM measurements for vehicle speed calculation and uses the steering actuator encoder measurements for steering angle calculation.
 
-# ROS2 Template C++
+The **measurement model** maps the state of the vehicle into the measurement variables. That is, it creates expected measurements. The measurements correct the filter predictions. For this, the GNSS/INS was used.
 
-Template repository for a ROS2 package with a publisher and a subscriber node.
+## Interfacing
+### Subscribers
+- /dynamics (lart_msgs/DynamicsCMD)
+- /gnss_ins (lart_msgs/GNSSINS)
 
-## Features
-- Template Docker file for portability;
-- DevContainer configuration for streamlined development in containers.
+### Publishers
+- /state_estimate (geometry_msgs/PoseWithCovarianceStamped)
 
-## First Steps / Adapting
+### Transforms
+- map -> base_link
 
-This repository contains two nodes:
-- **talker**: Publishes the "Hello World" string message every second;
-- **listener**: Subscribes the string message published by the publisher and logs the value.
+## Building and Running
 
-These are the main steps for you to start developing:
-1. In ```package.xml```, change the name, description and maintainer.
-```xml
-<name>my_package</name>
-<description>TODO: Package description</description>
-<maintainer email="root@todo.todo">root</maintainer>
-```
-2. If you want to create a new node, you can one of the existing as base. These are the steps:
-    1. Create a header file in ```include``` declaring the node constructor, member variables and methods. In this header file, be aware to use Doxygen-compatible comments for automatic documentation generation and autocomplete hints.
-    2. Create a source file in ```src``` with the implementation of the constructor and member methods. This file also contains the ```main``` function, which starts the node.
-    3. Add the node compilation declaration to ```CMakeLists.txt```
-    ```cmake
-    add_executable(my_node src/node.cpp)
-    ament_target_dependencies(my_node rclcpp std_msgs)
-    ```
+### Bare metal
+#### Requisites
+- ROS Humble
+- Eigen 3
+- [lart_common](https://github.com/FSLART/lart_common) (comes bundled as a submodule, no need to worry)
+- [lart_msgs](https://github.com/FSLART/lart_msgs)
 
-## Developing
+#### Building
+- Navigate to the workspace directory.
+- Run the command ```colcon build --symlink-install --parallel-workers 6```.
 
-If you want to develop barebones (with ROS and everything installed on your computer) you just need to create a ROS workspace and put this package in it in the ```src``` directory.
+#### Running
+- Run the command ```source install/setup.bash```.
+- Run the command ```ros2 run t24e_ekf state_estimator```.
 
-If you want to develop using Docker, which does not require installing ROS and may be faster to run, you have two ways:
-1. Build the Dockerfile using ```docker build -t my_package .``` and be on your own.
-2. Use the DevContainer.
+### Docker
+#### Requisites
+- Docker
 
-The main advantage of using the DevContainer is that VSCode provides a streamlined experience which seems like you are just developing locally with everything installed on your own computer.
+#### Building
+- Run the command ```docker build -t t24e_ekf .```.
 
-To start the DevContainer do the following:
-1. Open the repository in VSCode;
-    - Make sure you have the \"Dev Containers\" extension installed (the official from Microsoft).
-2. Press the ```F1``` key;
-3. Select the option \"Dev Containers: Build and Open in Container\";
-4. After waiting for a while, you should be inside the DevContainer in a VSCode environment which resembles a native one.
+#### Running
+- Run the command ```docker run --rm -it --network=host --pid=host --ipc=host t24e_ekf```.
+- Make sure you are in the root of the workspace inside the container.
+- Inside the container, run the commands:
+    - ```source /opt/ros/humble/setup.bash```
+    - ```ros2 run t24e_ekf state_estimator```
 
-If you are willing to use the Dev Container, eventually you will need to configure it (adding/removing directory binds, adding/removing VSCode extensions, etc.). You will do that in the ```.devcontainer/devcontainer.json``` file.
