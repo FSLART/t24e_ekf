@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
-	"name": "My Package",
+	"name": "t24e_ekf",
 	"build": {
 		// Sets the run context to one level up instead of the .devcontainer folder.
 		"context": "..",
@@ -22,8 +22,8 @@
 		"source=/my/bag/files,target=/bags,type=bind"
 	]*/
 
-	"workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws/src/my_package,type=bind",
-	"workspaceFolder": "/ros2_ws/src/my_package",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws/src/t24e_ekf,type=bind",
+	"workspaceFolder": "/ros2_ws/src/t24e_ekf",
 
 	"customizations": {
 		"vscode": {

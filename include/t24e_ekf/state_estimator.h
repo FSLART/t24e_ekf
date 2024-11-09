@@ -1,0 +1,72 @@
+/*
+MIT License
+
+Copyright (c) 2024 Associação Académica de Desportos Motorizados de Leiria (AADML)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#ifndef T24E_EKF_STATE_ESTIMATOR_H_
+#define T24E_EKF_STATE_ESTIMATOR_H_
+
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <tf2_ros/transform_broadcaster.h>
+#include "lart_msgs/msg/gnssins.hpp"
+#include "lart_msgs/msg/dynamics_cmd.hpp"
+#include "t24e_ekf/EKF.h"
+
+/*! \brief Simple subscriber class. Subscribes a string message. */
+class StateEstimator : public rclcpp::Node {
+
+    public:
+        /*! \brief Constructor of the state estimator class. */
+        StateEstimator();
+
+    private:
+        /*! \brief Subscriber for the dynamics message (used for the motion model). */
+        rclcpp::Subscription<lart_msgs::msg::DynamicsCMD>::SharedPtr dynamics_sub_;
+
+        /*! \brief Subscriber for the GNSS/INS message (used for the measurement model). */
+        rclcpp::Subscription<lart_msgs::msg::GNSSINS>::SharedPtr gnss_sub_;
+
+        /*! \brief Callback function for the dynamics message. */
+        void dynamics_callback(const lart_msgs::msg::DynamicsCMD& msg);
+
+        /*! \brief Callback function for the GNSS/INS message. */
+        void gnss_callback(const lart_msgs::msg::GNSSINS& msg);
+
+        /*! \brief Utility method to create a pose and covariance message from a state and covariance. */
+        geometry_msgs::msg::PoseWithCovarianceStamped create_state_message(Eigen::VectorXd state, Eigen::MatrixXd covariance);
+
+        /*! \brief Publisher for the state estimate. */
+        rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr state_pub_;
+
+        /*! \brief Transform broadcaster. */
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+        /*! \brief Extended Kalman Filter object. */
+        std::unique_ptr<EKF> ekf_;
+
+        /*! \brief Current state vector (x, y, theta, v). */
+        Eigen::VectorXd state_;
+
+};
+
+#endif // T24E_EKF_STATE_ESTIMATOR_H_
